@@ -629,7 +629,7 @@ backend_fetch ()
 
   # Report output
   [[ -n "$FOUND_PASSWORD" ]] || _die 1 "No backends could provides secret for: $secret_name"
-  printf "$FOUND_PASSWORD"
+  printf "%s" "$FOUND_PASSWORD"
   >&2 echo
 
   # Save history
