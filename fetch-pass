@@ -31,7 +31,7 @@ set -euo pipefail
 
 # Global vars
 APP_SCRIPT="${0##*/}"
-APP_NAME="${APP_SCRIPT%.*}"
+APP_NAME="fetch-pass"
 
 # Metadata vars
 APP_AUTHOR="mrjk"

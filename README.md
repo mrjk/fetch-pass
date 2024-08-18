@@ -27,24 +27,35 @@ Ensure the following dependencies are installed:
 - [`git-db`]()
 
 ### Install via ASDF or Mise
+
+Can be installed by both `mise` or `asdf`:
 ```bash
-asdf install secret-access-tool latest
-mise install secret-access-tool
+mise plugin install fetch-pass https://github.com/mrjk/asdf-fetch-pass.git
+mise use fetch-pass
+
+# With asdf
+asdf plugin add fetch-pass https://github.com/mrjk/asdf-fetch-pass.git
+asdf install fetch-pass latest
+asdf global fetch-pass latest
 ```
 
 ### Install via Curl
+
+Install it via curl:
 ```bash
-curl -o secret-access-tool.sh https://raw.githubusercontent.com/author/secret-access-tool/main/secret-access-tool.sh
-chmod +x secret-access-tool.sh
-mv secret-access-tool.sh /usr/local/bin/secret-access-tool
+curl -o fetch-pass https://raw.githubusercontent.com/mrjk/fetch-pass/main/fetch-pass
+chmod +x fetch-pass
+mv fetch-pass /usr/local/bin/fetch-pass
 ```
 
 ### Install from Source
+
+Install via git:
 ```bash
-git clone https://github.com/author/secret-access-tool.git
-cd secret-access-tool
-chmod +x secret-access-tool.sh
-mv secret-access-tool.sh /usr/local/bin/secret-access-tool
+git clone https://github.com/author/fetch-pass.git
+cd fetch-pass
+chmod +x fetch-pass
+ln -s fetch-pass /usr/local/bin/fetch-pass
 ```
 
 ## 🚀 Quickstart
@@ -75,8 +86,8 @@ remap = corp_user|Pro/Job/my_user@corp.io
 
 ### Configuration Path Lookup
 The tool looks for the configuration file in the following paths:
-- `$XDG_CONFIG_HOME/secret-access-tool/config.ini`
-- `$HOME/.config/secret-access-tool/config.ini`
+- `$XDG_CONFIG_HOME/fetch-pass/config.ini`
+- `$HOME/.config/fetch-pass/config.ini`
 
 ### Environment Variables
 - `APP_DRY`: Enable dry run mode (default: `false`).
@@ -112,4 +123,4 @@ Feedback is appreciated! Please submit a PR or open an issue on the GitHub repos
 ## 📜 Other Information
 - **Author**: Your Name
 - **License**: GPLv3
-- **Repository**: [GitHub](https://github.com/author/secret-access-tool)
+- **Repository**: [GitHub](https://github.com/author/fetch-pass)
