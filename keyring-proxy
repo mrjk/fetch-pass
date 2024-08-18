@@ -828,13 +828,13 @@ cli__keyring__rm ()
   local_keyring_rm $secret_name
 }
 
-cli__keyring__sync ()
-{
-  : "[BACKEND],Sync local keyring passwords"
-  local secret_name=$1
-  local backend=${2:-}
-  _die 1 "Not implemented yet"
-}
+# cli__keyring__sync ()
+# {
+#   : "[BACKEND],Sync local keyring passwords"
+#   local secret_name=$1
+#   local backend=${2:-}
+#   _die 1 "Not implemented yet"
+# }
 
 cli__config ()
 {
