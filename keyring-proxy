@@ -62,7 +62,13 @@ APP_REAL_NAME=$(basename "$SCRIPT_REAL_PATH")
 
 APP_CONFIG_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/$APP_REAL_NAME
 APP_CONFIG_FILE=$APP_CONFIG_DIR/config.ini
+
+APP_CACHE_DIR=${XDG_CACHE_HOME:-$HOME/.cache}/$APP_REAL_NAME
+APP_HIST_FILE="${APP_CACHE_DIR}/hist.log"
+
+# App config
 APP_DISABLE_KEYRING=false
+APP_DISABLE_HIST=false
 
 
 # CLI libraries
@@ -328,14 +334,18 @@ options:
 $options
 }"
 
+  hist_status='enabled'
+  [[ "${APP_DISABLE_KEYRING}" == 'false' ]] || hist_status='disabled'
   # Append extra infos
   if ! [[ "$func" == *"_"* ]]; then
     cat <<EOF
 info:
-  author: $APP_AUTHOR ${APP_EMAIL:+<$APP_EMAIL>}
-  version: ${APP_VERSION:-0.0.1}-${APP_STATUS:-beta}${APP_DATE:+ ($APP_DATE)}
-  license: ${APP_LICENSE:-MIT}
-  website: ${APP_URL}
+  config dir:   $APP_CONFIG_DIR
+  history file: $APP_HIST_FILE ($hist_status)
+  author:       $APP_AUTHOR ${APP_EMAIL:+<$APP_EMAIL>}
+  version:      ${APP_VERSION:-0.0.1}-${APP_STATUS:-beta}${APP_DATE:+ ($APP_DATE)}
+  license:      ${APP_LICENSE:-MIT}
+  website:      ${APP_URL}
 EOF
   fi
 
@@ -423,7 +433,12 @@ list_known_secrets ()
       } | sed 's/|.*//'
     done
 
-  } | sort -u
+    # From history
+    if [[ "${APP_DISABLE_HIST}" == 'false' ]]; then
+      hist_list | awk -F';' '{print $3}' | uniq
+    fi
+
+  } | sed '/^$/d' | sort -u
 
 }
 
@@ -448,7 +463,46 @@ backends_name_keyring_only ()
   done
 }
 
+# History Commands
+# =================
 
+# Save into history
+hist_save ()
+{
+  local secret_name=$1
+  local backend_name=$2
+
+  [[ "${APP_DISABLE_HIST}" == 'false' ]] || return 0
+
+  [[ -d "$APP_CACHE_DIR" ]] || _exec mkdir -p "$APP_CACHE_DIR"
+  [[ -f "$APP_HIST_FILE" ]] || {
+    _exec touch "$APP_HIST_FILE" || {
+      _log DEBUG "History is disabled as we can't create: $APP_HIST_FILE"
+      return 0
+    }
+  }
+
+  [[ -w "$APP_HIST_FILE" ]] || {
+    _log WARN "History is disabled as we can't write on: $APP_HIST_FILE"
+    return 0
+  }
+
+  local entry=$(echo "$(date --iso-8601=seconds);$backend_name;$secret_name")
+
+  if [[ "$APP_DRY" == true ]]; then
+    _log DRY "Append hist file '$APP_HIST_FILE' with: $entry"
+  else
+    echo "$entry" >> "$APP_HIST_FILE"
+  fi
+}
+
+# Query history
+hist_list ()
+{
+  [[ -f "$APP_HIST_FILE" ]] || return 0
+  cat "$APP_HIST_FILE" | sed '/^$/d'
+
+}
 
 # Backends Commands
 # =================
@@ -594,8 +648,10 @@ backend_fetch ()
   # Report output
   [[ -n "$FOUND_PASSWORD" ]] || _die 1 "No backends could provides secret for: $secret_name"
   printf "$FOUND_PASSWORD"
-  >&2 echo 
+  >&2 echo
 
+  # Save history
+  hist_save "$secret_name" "$backend_name"
 }
 
 
@@ -677,6 +733,12 @@ cli__ls ()
   # echo YOOOO
 }
 
+cli__hist ()
+{
+  : ",Show query history"
+  [[ "${APP_DISABLE_HIST}" == 'false' ]] || _die 1 "History is not enabled"
+  hist_list | awk -F ';' '{ print $1 " via " $2 ": " $3 }' | sed 's/T/ /'
+}
 
 cli__keyring__st ()
 {
@@ -922,6 +984,7 @@ cli_init ()
 
   export APP_CONFIG_FILE=${KEYRING_PROXY__CONF:-$APP_CONFIG_FILE}
   export APP_DISABLE_KEYRING=${KEYRING_PROXY__DISABLE_KEYRING:-$APP_DISABLE_KEYRING}
+  export APP_DISABLE_HIST=${KEYRING_PROXY__DISABLE_HIST:-$APP_DISABLE_HIST}
 }
 
 # Check if all required bin are available in PATH
