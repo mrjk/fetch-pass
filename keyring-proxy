@@ -31,7 +31,7 @@ set -euo pipefail
 
 # Global vars
 APP_SCRIPT="${0##*/}"
-APP_NAME="fetch-pass"
+APP_NAME="keyring-proxy"
 
 # Metadata vars
 APP_AUTHOR="mrjk"
@@ -347,12 +347,12 @@ EOF
 
 _db ()
 {
-  _log TRACE "Query db: git-db -s '$FETCH_SECRET_CONF' $@"
-  git-db -s "$FETCH_SECRET_CONF" "$@" 2>/dev/null
+  _log TRACE "Query db: git-db -s '$APP_CONFIG_FILE' $@"
+  git-db -s "$APP_CONFIG_FILE" "$@" 2>/dev/null
   # if [[ "$APP_LOG_LEVEL" == "TRACE" ]]; then
-  #   git-db -s "$FETCH_SECRET_CONF" "$@"
+  #   git-db -s "$APP_CONFIG_FILE" "$@"
   # else
-  #   git-db -s "$FETCH_SECRET_CONF" "$@" 2>/dev/null
+  #   git-db -s "$APP_CONFIG_FILE" "$@" 2>/dev/null
   # fi
 }
 
@@ -615,21 +615,21 @@ cli__usage ()
 
   example:
     # Fetch existing password
-    fetch-pass get john_account
+    keyring-proxy get john_account
 
   example with local keyring:
 
     # Add/update to local secret is slow to fetch
-    fetch-pass keyring add john_account
+    keyring-proxy keyring add john_account
 
     # Check keyring status
-    fetch-pass keyring st john_account
+    keyring-proxy keyring st john_account
 
     # Check new speed
-    time fetch-pass get john_account
+    time keyring-proxy get john_account
 
     # remove from local keyring
-    fetch-pass keyring rm john_account
+    keyring-proxy keyring rm john_account
 
 # Configuration
 
@@ -920,8 +920,8 @@ cli_init ()
   export WORK_DIR=${VCS_DIR:-${SCRIPT_DIR:-$PWD}}
   export PWD_DIR=${PWD}
 
-  export FETCH_SECRET_CONF=${FETCH_SECRET_CONF:-$APP_CONFIG_FILE}
-  export APP_DISABLE_KEYRING=${FETCH_SECRET_KEYRING:-$APP_DISABLE_KEYRING}
+  export APP_CONFIG_FILE=${KEYRING_PROXY__CONF:-$APP_CONFIG_FILE}
+  export APP_DISABLE_KEYRING=${KEYRING_PROXY__DISABLE_KEYRING:-$APP_DISABLE_KEYRING}
 }
 
 # Check if all required bin are available in PATH
