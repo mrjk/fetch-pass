@@ -128,7 +128,7 @@ _exec ()
     _log RUN "  | ${cmd[@]}"
     "${cmd[@]}"
   fi
-}   
+}
 
 # Dump all application vars (debug)
 # shellcheck disable=SC2120 # Argument is optional by default
@@ -450,11 +450,9 @@ backends_names ()
   } | sort -u | tr '\n' ',' | sed 's/,$//'
 }
 
+# Return only keyring backends
 backends_name_keyring_only ()
 {
-
-  # _die 1 "DEPRECATED FUNCTION backends_name_keyring_only"
-  # return 1
   local backend_names=$(backends_names)
   for backend_name in ${backend_names//,/ } ; do
     if [[ "$backend_name" == keyring* ]]; then
@@ -519,7 +517,7 @@ backends_name_first_keyring ()
   return 1
 }
 
-# Backend remap name 
+# Backend remap name
 backend_remap_name ()
 {
   local backend_name=$1
@@ -589,7 +587,7 @@ _filter_backends ()
 # Find best backend for a given secret
 backend_secret_matches ()
 {
-  local secret_name=$1 
+  local secret_name=$1
   local query_mode=${2:-all}
   local ret=
 
@@ -703,7 +701,6 @@ EOF
 
 }
 
-
 cli__get ()
 {
   : "NAME,Get password name"
@@ -715,7 +712,6 @@ cli__ls ()
 {
   : ",List secret names"
   list_known_secrets
-  # echo YOOOO
 }
 
 cli__hist ()
@@ -915,46 +911,6 @@ cli__keyring ()
 }
 
 
-# # Basic simple level sub-commands
-# # ---------------
-# cli__group__add()
-# {
-#   : "NAME [OPTS],Add subcommand"
-#   echo "Add: '$1' in '$mode' mode with message: '$msg'"
-# }
-
-# cli__group__rm()
-# {
-#   : "NAME,Remove subcommand"
-#   echo "Remove: $1"
-# }
-
-
-# # Nested command names
-# # ---------------
-# cli__group__var ()
-# {
-#   : "," # Ignored from help
-#   clish_dispatch cli__group__var__ "$@" \
-#     || _die $? "Group command failed with error: $?" 
-# }
-
-# cli__group__var__get()
-# {
-#   : "VAR,Get variable"
-#   echo "Value of var $1 is current date: $(date)"
-# }
-
-# cli__group__var__set()
-# {
-#   : "VAR VALUE,Set variable value"
-#   local name=$1
-#   shift
-#   [ $# -gt 0 ] || return 42
-#   echo "Value of var '$name' set to: $@"
-# }
-
-
 # Core App
 # =================
 
@@ -1050,7 +1006,7 @@ cli_options ()
       *)
         args=( "$@" )
         shift $#
-        
+
         # To enable greedy parsing
         # args+=( "$1" )
         # shift 1
