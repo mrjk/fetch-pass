@@ -552,7 +552,7 @@ backend_query ()
   _log TRACE "Query backend command: $cmd"
   local result=$( $cmd 2>/dev/null )
   # set -x
-  #local result=$( $cmd )
+  # local result=$( $cmd )
   # set +x
 
   if [[ -z "$result" ]]; then
@@ -637,8 +637,6 @@ backend_fetch ()
 }
 
 
-
-
 ###############
 cli__usage ()
 {
@@ -698,7 +696,6 @@ cli__usage ()
   desc = Main user config
 
 EOF
-
 }
 
 cli__get ()
@@ -771,14 +768,10 @@ cli__keyring__add ()
     || _die 1 "There is no backend '$backend' in config, please choose one of: ${backends_names//,/ }"
 
 
-
   # Fetch secret from other sources than keyring
   password=$(backend_fetch "no_keyring" "$secret_name" ) || {
       _die $? "Can't retrieve current password"
     }
-  # password=$(backend_fetch "no_keyring" "$secret_name" 2>/dev/null) || {
-  #     _die $? "Can't retrieve current password"
-  #   }
 
 
   # Save in keyring
