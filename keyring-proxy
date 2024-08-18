@@ -552,9 +552,9 @@ backend_query ()
 
   local cmd=$(printf "${backend_cmd}\n" "$new_key")
   _log TRACE "Query backend command: $cmd"
-  # local result=$( $cmd 2>/dev/null )
+  local result=$( $cmd 2>/dev/null )
   # set -x
-  local result=$( $cmd )
+  #local result=$( $cmd )
   # set +x
 
   if [[ -z "$result" ]]; then
@@ -1004,25 +1004,25 @@ cli_options ()
     case "$1" in
       -h|--help|h)
         : ",Show this help message"
-        clish_help cli; 
-        _die 0
+        args=( "help" "$@" )
+        shift
         ;;
       -n|--dry)
         : ",Enable dry mode"
         _log INFO "Dry mode enabled"
-        APP_DRY=true 
+        APP_DRY=true
         shift
         ;;
       -f|--force)
         : ",Enable force mode"
         _log INFO "Force mode enabled"
-        APP_FORCE=true 
+        APP_FORCE=true
         shift
         ;;
       -K|--no-keyring)
         : ",Disable local keyring"
         _log INFO "Keyring is disabled"
-        APP_DISABLE_KEYRING=true 
+        APP_DISABLE_KEYRING=true
         shift
         ;;
       -v|-vv|-vvv|--verbose)
@@ -1069,6 +1069,9 @@ cli ()
   clish_parse_opts cli "$@"
   set -- "${args[@]}"
 
+  # Init app
+  cli_init
+
   # Route commands before requirements
   local cmd=${1:-help}
   shift 1 || true
@@ -1076,16 +1079,14 @@ cli ()
     -h|--help|help) clish_help cli; return ;;
     # expl) cli__example "$@"; return ;;
   esac
-  
-  # Init app
-  cli_init
-  
+
+
   # Check requirements
-  cli_require 
+  cli_require
 
   # Dispatch subcommand
   clish_dispatch cli__ "$cmd" "$@" \
-    || _die $? "Command '$cmd' returned error: $?"  
+    || _die $? "Command '$cmd' returned error: $?"
 }
 
 cli "${@}"
