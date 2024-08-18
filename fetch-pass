@@ -1,14 +1,28 @@
 #!/bin/bash
 # TEMPLATE_VERSION=2024-08-27
 
-# Basic bash template for command/resource based CLI.
-# Features:
-# * Automatic command discovery and help generation
-# * Logging and traces
-# * Application dependency checker
-# * Support for getopts
-# * Return code support
-# * Command executor with dry mode
+# Script informations
+# =========================
+
+# Simple tool to access secrets in various sources
+
+# Use cases
+# * Useful to fetch passwords in terminal or in scripts
+# * Provide a simple endpoint that display a password for a given secret_name
+# * Allow to integrate basically any other password manager
+
+# Base features
+# * Nice CLI and simple optional ini file configuration
+# * Allow to manage any secret backends
+# * Allow easily to import/sync with local keyring deamon
+# * Allow secret name remapping depending backends
+# * Simple ini file configuration
+# * Portable bash script
+# * Secret completion (when keyring is unlocked)
+
+# Dependencies:
+# * git-db: WIP
+
 
 set -euo pipefail
 
@@ -20,15 +34,15 @@ APP_SCRIPT="${0##*/}"
 APP_NAME="${APP_SCRIPT%.*}"
 
 # Metadata vars
-APP_AUTHOR="author"
-APP_EMAIL="email@address.org"
+APP_AUTHOR="mrjk"
+APP_EMAIL="mrjk.78 at gmail.com"
 APP_LICENSE="GPLv3"
 APP_URL="https://github.com/$APP_AUTHOR/$APP_NAME"
 APP_REPO="https://github.com/$APP_AUTHOR/$APP_NAME.git"
 APP_GIT="git@github.com:$APP_AUTHOR/$APP_NAME.git"
 
-APP_STATUS=alpha
-APP_DATE="2024-08-01"
+APP_STATUS=stable
+APP_DATE="2024-08-17"
 APP_VERSION=0.0.1
 
 # App configuration
@@ -321,6 +335,7 @@ info:
   author: $APP_AUTHOR ${APP_EMAIL:+<$APP_EMAIL>}
   version: ${APP_VERSION:-0.0.1}-${APP_STATUS:-beta}${APP_DATE:+ ($APP_DATE)}
   license: ${APP_LICENSE:-MIT}
+  website: ${APP_URL}
 EOF
   fi
 
@@ -591,7 +606,8 @@ cli__usage ()
 {
   : ",Show usage"
 
-  cat << -EOF
+  cat <<- 'EOF'
+
 # Introduction
 
 
@@ -622,7 +638,7 @@ cli__usage ()
 ## Configuration example
 
   Cobnfiguration example:
-```
+
 # Global config
 [config]
   backends = keyring_corp,keepass_corp,keepass_personal
@@ -642,9 +658,6 @@ cli__usage ()
 # Secrets config
 [secret "activia_user"]
   desc = Main user config
-
-```
-
 
 EOF
 
