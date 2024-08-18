@@ -6,6 +6,7 @@ A simple tool to access secrets from various sources. It's perfect for fetching 
 ### Highlights
 
 - **Secret Management**: Easily manage any secret backends with a simple configuration.
+- **Query history**: Quickly find previously passwords
 - **Local Keyring Support**: Integrates with the local keyring daemon for faster access.
 - **Portable Bash Script**: Works out of the box on most Unix-based systems.
 
@@ -97,8 +98,18 @@ The tool looks for the configuration file in the following paths:
 - `$HOME/.config/keyring-proxy/config.ini`
 
 ### Environment Variables
+
+Specific app vars:
+
+- `KEYRING_PROXY__CONF`: Keyring proxy configuration file.
+- `KEYRING_PROXY__DISABLE_HIST`: Disable history (default: `false`).
+- `KEYRING_PROXY__DISABLE_KEYRING`: Disable local keyring (default: `false`).
+
+Generic app vars:
+
 - `APP_DRY`: Enable dry run mode (default: `false`).
 - `APP_FORCE`: Force execution (default: `false`).
+
 
 ## 📄 Configuration File
 
