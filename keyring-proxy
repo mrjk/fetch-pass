@@ -565,20 +565,19 @@ backend_query ()
 
 }
 
-
-# Filter backend list by type
+# Filter backends by type
 _filter_backends ()
 {
   local mode=$1
   case "$mode" in
     no_keyring)
-      tr ',' '\n' | grep -v '^keyring' | tr '\n' ','
+      tr ',' '\n' | grep -v '^keyring' | uniq | tr '\n' ','
     ;;
     keyring_only)
-      tr ',' '\n' | grep '^keyring' | tr '\n' ','
+      tr ',' '\n' | grep '^keyring' | uniq | tr '\n' ','
     ;;
     all)
-      cat -
+      tr ',' '\n' | uniq | tr '\n' ','
     ;;
     *)
       cat -
@@ -602,35 +601,20 @@ backend_secret_matches ()
 
   [[ -n "$ret" ]] || return 1
 
-  ret2=$(_filter_backends "${query_mode}" <<<"$ret" )
-
-  # DEPRECATED
-  if [[ "${query_mode}" == 'no_keyring' ]]; then
-    ret=$(tr ',' '\n' <<< "$ret" | grep -v '^keyring' | tr '\n' ',' )
-  elif [[ "${query_mode}" == 'keyring_only' ]]; then
-    ret=$(tr ',' '\n' <<< "$ret" | grep '^keyring' | tr '\n' ',' )
-  elif [[ "${query_mode}" == 'all' ]]; then
-    :
-  else
-    _die "Backend query mode error: $query_mode"
-  fi
-
-  [[ "$ret2" == "$ret" ]] || _die 5 "Bug on new algo !!!"
-
+  ret=$(_filter_backends "${query_mode}" <<<"$ret" )
   [[ -n "$ret" ]] || return 1
   echo "$ret"
 }
 
-
-
 # Query backends one by one until first secret is found
 backend_fetch ()
 {
-  local secret_name=${1:-}
-  local query_mode=${2:-all}
+  local query_mode=${1:-all}
+  local secret_name=${2}
 
   # Fetch secret backends
-  local backends=$(backend_secret_matches "$secret_name" "$query_mode")
+  local backends=
+  backends=$(backend_secret_matches "$secret_name" "$query_mode")
   [[ -n "$backends" ]] || _die 5 "Could not find secret backends for: $secret_name"
 
   # Test each backends
@@ -723,7 +707,8 @@ EOF
 cli__get ()
 {
   : "NAME,Get password name"
-  backend_fetch "$@" "all"
+  local arg="$@"
+  backend_fetch "all" "$arg"
 }
 
 cli__ls ()
@@ -792,10 +777,10 @@ cli__keyring__add ()
 
 
   # Fetch secret from other sources than keyring
-  password=$(backend_fetch "$secret_name" "no_keyring") || {
+  password=$(backend_fetch "no_keyring" "$secret_name" ) || {
       _die $? "Can't retrieve current password"
     }
-  # password=$(backend_fetch "$secret_name" "no_keyring" 2>/dev/null) || {
+  # password=$(backend_fetch "no_keyring" "$secret_name" 2>/dev/null) || {
   #     _die $? "Can't retrieve current password"
   #   }
 
