@@ -945,7 +945,7 @@ cli_require ()
 cli_usage ()
 {
   cat <<EOF
-${APP_NAME} is command line tool
+${APP_NAME} is command line tool to proxy secret keyring queries among different backends
 
 usage: ${APP_NAME} <COMMAND> <TARGET> [<ARGS>]
        ${APP_NAME} help
