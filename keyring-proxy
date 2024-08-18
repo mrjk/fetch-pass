@@ -853,17 +853,18 @@ cli__db ()
 # # CLI Sub Commands
 # # =================
 
-# # Display help message
-# cli__group_usage ()
-# {
-#   cat <<EOF
-# ${APP_NAME}: Manage groups (Subcommand example)
+# Display help message
+cli__keyring_usage ()
+{
+  cat <<EOF
+${APP_NAME}: Manage keyring
 
-# usage: ${APP_NAME} group [OPTS] add NAME
-#        ${APP_NAME} group [OPTS] rm NAME
-#        ${APP_NAME} group help
-# EOF
-# }
+usage: ${APP_NAME} keyring add NAME
+       ${APP_NAME} keyring rm NAME
+       ${APP_NAME} keyring st NAME
+       ${APP_NAME} keyring help
+EOF
+}
 
 # Read CLI options, shows group level options
 cli__keyring_options ()
@@ -871,9 +872,9 @@ cli__keyring_options ()
   while [[ ! -z "${1:-}" ]]; do
     # : "parse-opt-start"
     case "$1" in
-      -h|--help|help)
+      -h|--help|help|h)
         : ",Show help"
-        clish_help cli__group; _die 0
+        clish_help cli__keyring; _die 0
         ;;
       -a|--all)
         : ",Select all"
@@ -905,6 +906,12 @@ cli__keyring ()
   # Parse args
   clish_parse_opts cli__keyring "$@"
   set -- "${args[@]}"
+
+  # Show group help
+  [[ "${1:-}" != 'keyring' ]] || {
+    clish_help cli__keyring
+    _die 0
+  }
 
   # Dispatch to sub commands
   clish_dispatch cli__keyring__ "$@" || _die $?
