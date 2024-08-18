@@ -1,5 +1,4 @@
-
-# 🚀 Fetch Pass
+# 🚀 Keyring Proxy
 
 
 A simple tool to access secrets from various sources. It's perfect for fetching passwords in terminal or scripts and provides a simple endpoint to display a password for a given secret name. It also allows integration with various password managers.
@@ -30,32 +29,40 @@ Ensure the following dependencies are installed:
 
 Can be installed by both `mise` or `asdf`:
 ```bash
-mise plugin install fetch-pass https://github.com/mrjk/asdf-fetch-pass.git
-mise use fetch-pass
+mise plugin install keyring-proxy https://github.com/mrjk/asdf-keyring-proxy.git
+mise use keyring-proxy
 
 # With asdf
-asdf plugin add fetch-pass https://github.com/mrjk/asdf-fetch-pass.git
-asdf install fetch-pass latest
-asdf global fetch-pass latest
+asdf plugin add keyring-proxy https://github.com/mrjk/asdf-keyring-proxy.git
+asdf install keyring-proxy latest
+asdf global keyring-proxy latest
 ```
 
 ### Install via Curl
 
 Install it via curl:
 ```bash
-curl -o fetch-pass https://raw.githubusercontent.com/mrjk/fetch-pass/main/fetch-pass
-chmod +x fetch-pass
-mv fetch-pass /usr/local/bin/fetch-pass
+curl -o keyring-proxy https://raw.githubusercontent.com/mrjk/keyring-proxy/main/keyring-proxy
+chmod +x keyring-proxy
+mv keyring-proxy /usr/local/bin/keyring-proxy
 ```
 
 ### Install from Source
 
 Install via git:
 ```bash
-git clone https://github.com/author/fetch-pass.git
-cd fetch-pass
-chmod +x fetch-pass
-ln -s fetch-pass /usr/local/bin/fetch-pass
+git clone https://github.com/mrjk/keyring-proxy.git
+cd keyring-proxy
+chmod +x keyring-proxy
+ln -s keyring-proxy /usr/local/bin/keyring-proxy
+```
+
+### Verify installation
+
+Should be able to get `keyring-proxy` version and help message:
+```bash
+keyring-proxy --version
+keyring-proxy --help
 ```
 
 ## 🚀 Quickstart
@@ -64,12 +71,12 @@ ln -s fetch-pass /usr/local/bin/fetch-pass
 Define a backend and query the secret:
 
 ```bash
-fetch-pass get my_secret
+keyring-proxy get my_secret
 ```
 
 ### Adding to Local Keyring
 ```bash
-fetch-pass keyring add my_secret
+keyring-proxy keyring add my_secret
 ```
 
 ### Simple INI Configuration Example
@@ -86,8 +93,8 @@ remap = corp_user|Pro/Job/my_user@corp.io
 
 ### Configuration Path Lookup
 The tool looks for the configuration file in the following paths:
-- `$XDG_CONFIG_HOME/fetch-pass/config.ini`
-- `$HOME/.config/fetch-pass/config.ini`
+- `$XDG_CONFIG_HOME/keyring-proxy/config.ini`
+- `$HOME/.config/keyring-proxy/config.ini`
 
 ### Environment Variables
 - `APP_DRY`: Enable dry run mode (default: `false`).
@@ -111,7 +118,7 @@ remap = corp_user|Pro/Job/my_user@corp.io
 
 ### Command-Line Help
 ```bash
-fetch-pass --help
+keyring-proxy --help
 ```
 
 ## ❗ Known Issues
@@ -123,4 +130,4 @@ Feedback is appreciated! Please submit a PR or open an issue on the GitHub repos
 ## 📜 Other Information
 - **Author**: Your Name
 - **License**: GPLv3
-- **Repository**: [GitHub](https://github.com/author/fetch-pass)
+- **Repository**: [GitHub](https://github.com/mrjk/keyring-proxy)
