@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 <!--- CHANGELOG_APPEND -->
 
+## Release: v0.1.2 (2024-08-18)
+
+[Compare code on Github](https://github.com/mrjk/keyring-proxy/compare/v0.1.1...v0.1.2)
+
+- [0236bd4](https://github.com/mrjk/keyring-proxy/commit/0236bd4) `2024-08-18 19:58:08 -0400` mrjk fix: CHANGELOG anchor tag
+- [7427ed0](https://github.com/mrjk/keyring-proxy/commit/7427ed0) `2024-08-18 19:16:00 -0400` mrjk doc: improve documentation
+
 ## Release: v0.1.1 (2024-08-18)
 
 - `a99a2de` `2024-08-18 18:53:30 -0400` mrjk fix: bug when password had special chars
