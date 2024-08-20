@@ -163,12 +163,15 @@ remap = corp_user|Pro/Job/my_user@corp.io
 
 Command line usage:
 ```
-keyring-proxy is command line tool to proxy secret keyring queries among different backends
+keyring-proxy is a simple tool to access secrets from various sources, quickly.
 
-usage: keyring-proxy <COMMAND> <TARGET> [<ARGS>]
+usage: keyring-proxy [<OPTS>] <COMMAND>
        keyring-proxy help
 
 commands:
+  cache             COMMAND               Manage cache
+  cache clear                             Clear keyring cache entries
+  cache ls                                List keyring cache entries
   config            OPTS                  Query config
   db                OPTS                  Query config
   get               NAME                  Get password name
@@ -188,11 +191,13 @@ options:
   -v|-vv|-vvv|--verbose  [LEVEL]               Set verbosity level
   -V|--version                            Show version
 
+status:
+  config file:  /home/rcordier/.config/keyring-proxy/config.ini
+  history file: /home/rcordier/.cache/keyring-proxy/hist.log (enabled)
+
 info:
-  config dir:   /home/mrjk/.config/keyring-proxy
-  history file: /home/mrjk/.cache/keyring-proxy/hist.log (enabled)
   author:       mrjk <mrjk.78 at gmail.com>
-  version:      0.1.1-stable (2024-08-17)
+  version:      0.1.1-stable (2024-08-20)
   license:      GPLv3
   website:      https://github.com/mrjk/keyring-proxy
 ```
