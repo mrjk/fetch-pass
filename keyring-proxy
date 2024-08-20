@@ -589,7 +589,10 @@ backend_remap_name ()
   remaps=$(_db get "backend.$backend_name.remap" 2>/dev/null )
   while IFS='|' read old new _; do
     [[ -n "$old" ]] || continue
-    if [[ "$old" == "$secret" ]]; then
+    if [[ -z "$new" ]]; then
+      _log WARN "Empty remap rule in '$backend_name' for: $secret"
+      continue
+    elif [[ "$old" == "$secret" ]]; then
       _log DEBUG "Backend '$backend_name' remapped secret '$secret' to '$new'"
       echo "$new"
       return 0
