@@ -378,12 +378,13 @@ local_keyring_add ()
   local secret_name=$1
   local pass=$2
 
-  local label="$APP_NAME password for $secret_name"
+  local label="$APP_NAME: $FOUND_BACKEND - $secret_name"
 
   _log TRACE "Local Keyring: add $secret_name"
   echo -n "$pass" | secret-tool store --label "$label" \
     application "$APP_NAME" \
-    fetch-secret-name $secret_name
+    keyring-proxy-secret-name "$secret_name" \
+    keyring-proxy-backend "$FOUND_BACKEND"
 }
 
 # Remove keyring entry
@@ -392,7 +393,7 @@ local_keyring_rm ()
   local secret_name=$1
   _log TRACE "Local Keyring: rm $secret_name"
   secret-tool clear \
-    fetch-secret-name $secret_name
+    keyring-proxy-secret-name "$secret_name"
 }
 
 # Show keyring entry
@@ -401,7 +402,17 @@ local_keyring_show ()
   local secret_name=$1
   _log TRACE "Local Keyring: show $secret_name"
   secret-tool search \
-    fetch-secret-name $secret_name
+    keyring-proxy-secret-name "$secret_name"
+}
+
+
+# Get keyring entry
+local_keyring_get ()
+{
+  local secret_name=$1
+  _log TRACE "Local Keyring: show $secret_name"
+  secret-tool lookup \
+    keyring-proxy-secret-name "$secret_name"
 }
 
 # Check if entry exists in keyring
@@ -549,13 +560,10 @@ backend_query ()
   backend_cmd=$(_db get "backend.$backend_name.cmd-fetch" 2>/dev/null )
   new_key=$(backend_remap_name "$backend_name" "$secret_name")
 
+  local cmd=$(printf "${backend_cmd}" "$new_key")
 
-  local cmd=$(printf "${backend_cmd}\n" "$new_key")
   _log TRACE "Query backend command: $cmd"
-  local result=$( $cmd 2>/dev/null )
-  # set -x
-  # local result=$( $cmd )
-  # set +x
+  local result=$( $cmd ) # Hidding stderr is bad idea ... 2>/dev/null )
 
   if [[ -z "$result" ]]; then
     _log TRACE "Empty results returned from backend command"
@@ -620,9 +628,11 @@ backend_fetch ()
   # Test each backends
   _log INFO "Ask backends for secret '$secret_name': ${backends//,/, }"
   export FOUND_PASSWORD=
+  export FOUND_BACKEND=
   for backend_name in ${backends//,/ }; do
     if backend_query "$backend_name" "$secret_name"; then
       _log INFO "Result found in '$backend_name' backend for: '$new_key'"
+      FOUND_BACKEND="$backend_name"
       break
     else
       _log DEBUG "No result found in '$backend_name' backend for: '$new_key'"
@@ -635,7 +645,7 @@ backend_fetch ()
   >&2 echo
 
   # Save history
-  hist_save "$secret_name" "$backend_name"
+  hist_save "$secret_name" "$FOUND_BACKEND"
 }
 
 
@@ -771,7 +781,7 @@ cli__keyring__add ()
 
 
   # Fetch secret from other sources than keyring
-  password=$(backend_fetch "no_keyring" "$secret_name" ) || {
+  backend_fetch "no_keyring" "$secret_name" >&/dev/null || {
       _die $? "Can't retrieve current password"
     }
 
@@ -783,10 +793,10 @@ cli__keyring__add ()
   if local_keyring_exists "$secret_name" ; then
     _log INFO "Update local keyring secret: $secret_name"
     local_keyring_rm "$secret_name"
-    local_keyring_add "$secret_name" "$password"
+    local_keyring_add "$secret_name" "$FOUND_PASSWORD"
   else
     _log INFO "Create new keyring secret: $secret_name"
-    local_keyring_add "$secret_name" "$password"
+    local_keyring_add "$secret_name" "$FOUND_PASSWORD"
   fi
 
 }
