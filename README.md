@@ -1,16 +1,17 @@
 # 🚀 Keyring Proxy
 
-A simple tool to access secrets from various sources. It's perfect for fetching passwords in terminal or scripts and provides a simple endpoint to display a password for a given secret name. It also allows integration with any password managers that support CLI or API.
+A simple tool to access secrets from various sources, quickly. Like its name says, it's a proxy that can cache answers in local keyring for faster/offline access.
+
+It's perfect for fetching passwords in terminal or scripts and provides a simple command to display the password of a given secret name. It also integrates with any password managers that support CLI or API.
 
 
 ### Highlights
 
-- **Secret Management**: Easily manage any secret backends with a simple configuration.
-- **Dispatch rules**: You can specify query rules depending the secret name that forward to specific backend.
-- **Local keyring proxy**: Sometimes, you just want to use local keyring as a fast proxy in front of slow/remote bakends. This is now easy to sync your local keyring password from other source of truth.
-- **Query history**: Quickly find previously passwords. Never try to remember again your previously entered secrets. But it can be disabled for more privacy.
-- **Local Keyring Support**: Integrates with the local keyring daemon for faster access. But it can be disabled.
-- **Portable Bash Script**: Works out of the box on most Unix-based systems.
+- **Backends agnostic**: Easily manage any secret backends with a simple ini configuration.
+- **Dispatch rules**: You can rewrite secret name globally (like aliases) or per backend (linke rewrite).
+- **Local keyring proxy**: Optionnaly uses the local system keyring as a cache layer to retrieve slow-to-fecth secrets. It's also easy to flush the local cache or to resync it with backends.
+- **Query history**: Quickly find previously queried passwords. Never try to remember anymore your previous queries. It can be disabled for more privacy.
+- **Portable Bash Script**: Single file script that works out of the box on most Unix-based systems. (Tested on linux so far)
 
 
 ## 📚 Table of Contents
@@ -205,6 +206,7 @@ info:
 ## ❗ Known Issues
 
 - Only tested on linux
+- Git ini file support and bash choice of script language make sometime difficult or impossible to correctly handle arguments with spaces for backends
 
 ## 💬 Support
 Feedback is appreciated! Please submit a PR or open an issue on the GitHub repository.
