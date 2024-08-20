@@ -339,9 +339,11 @@ $options
   # Append extra infos
   if ! [[ "$func" == *"_"* ]]; then
     cat <<EOF
-info:
-  config dir:   $APP_CONFIG_DIR
+status:
+  config file:  $APP_CONFIG_FILE
   history file: $APP_HIST_FILE ($hist_status)
+
+info:
   author:       $APP_AUTHOR ${APP_EMAIL:+<$APP_EMAIL>}
   version:      ${APP_VERSION:-0.0.1}-${APP_STATUS:-beta}${APP_DATE:+ ($APP_DATE)}
   license:      ${APP_LICENSE:-MIT}
@@ -869,17 +871,6 @@ cli__keyring_options ()
         : ",Show help"
         clish_help cli__keyring; _die 0
         ;;
-      -a|--all)
-        : ",Select all"
-        mode=all
-        shift
-        ;;
-      -m|--message)
-        : "MSG,Define message"
-        [[ ! -z "${2:-}" ]] || _die 1 "Missing message"
-        msg=$2
-        shift 2
-        ;;
       -*)
         _die 1 "Unknown option: $1"
         ;;
@@ -945,9 +936,9 @@ cli_require ()
 cli_usage ()
 {
   cat <<EOF
-${APP_NAME} is command line tool to proxy secret keyring queries among different backends
+${APP_NAME} is a simple tool to access secrets from various sources, quickly.
 
-usage: ${APP_NAME} <COMMAND> <TARGET> [<ARGS>]
+usage: ${APP_NAME} [<OPTS>] <COMMAND>
        ${APP_NAME} help
 EOF
 }
