@@ -423,6 +423,56 @@ local_keyring_exists ()
   [[ -n "$result" ]] || return 1
 }
 
+
+# Local keyring Cache Commands
+# =================
+
+# Add into cache
+keyring_cache_set ()
+{
+  [[ "$APP_DISABLE_KEYRING" == false ]] || return 0
+
+  local secret_name="$1"
+  local pass=$2
+
+  # Check if secret does not exists
+  if local_keyring_exists "$secret_name" ; then
+    _log TRACE "Update cached keyring secret: $secret_name"
+    local_keyring_rm "$secret_name"
+  else
+    _log TRACE "Cache Keyring: add $secret_name"
+
+  fi
+
+  local label="$APP_NAME: cache - $secret_name"
+  echo -n "$pass" | secret-tool store --label "$label" \
+    application "$APP_NAME" \
+    keyring-proxy-secret-name "$secret_name" \
+    keyring-proxy-cache "true"
+
+}
+
+# Fetch from cache
+keyring_cache_get ()
+{
+  local_keyring_get "$1"
+}
+
+# Clear keyring cache
+keyring_cache_clear ()
+{
+    secret-tool clear keyring-proxy-cache "true"
+}
+
+# Show keyring cache
+keyring_cache_ls ()
+{
+    secret-tool search --all keyring-proxy-cache "true" 2>/dev/null \
+    | grep '^label' \
+    | sed 's/.* = //'
+}
+
+
 # Config Commands
 # =================
 
@@ -620,6 +670,20 @@ backend_fetch ()
   local query_mode=${1:-all}
   local secret_name=${2}
 
+  # Look into keyring cache
+  if [[ "$APP_DISABLE_KEYRING" == false ]]; then
+    local cached_result=$(keyring_cache_get "$secret_name")
+    if [[ -n "$cached_result" ]]; then
+      _log INFO "Return '$secret_name' key in keyring cache"
+      printf "%s" "$cached_result"
+      >&2 echo
+      return
+    else
+      _log DEBUG "Not found in cache"
+    fi
+  fi
+
+
   # Fetch secret backends
   local backends=
   backends=$(backend_secret_matches "$secret_name" "$query_mode")
@@ -643,6 +707,9 @@ backend_fetch ()
   [[ -n "$FOUND_PASSWORD" ]] || _die 1 "No backends could provides secret for: $secret_name"
   printf "%s" "$FOUND_PASSWORD"
   >&2 echo
+
+  # Save in cache
+  keyring_cache_set "$secret_name" "$FOUND_PASSWORD"
 
   # Save history
   hist_save "$secret_name" "$FOUND_BACKEND"
@@ -909,6 +976,78 @@ cli__keyring ()
 
   # Dispatch to sub commands
   clish_dispatch cli__keyring__ "$@" || _die $?
+}
+
+
+# CLI Cache Commands
+# =================
+
+# Display help message
+cli__cache_usage ()
+{
+  cat <<EOF
+${APP_NAME}: Manage cache
+
+usage: ${APP_NAME} cache clear
+       ${APP_NAME} cache ls
+       ${APP_NAME} cache help
+EOF
+}
+
+# Read CLI options, shows group level options
+cli__cache_options ()
+{
+  while [[ ! -z "${1:-}" ]]; do
+    # : "parse-opt-start"
+    case "$1" in
+      -h|--help|help|h)
+        : ",Show help"
+        clish_help cli__cache; _die 0
+        ;;
+      -*)
+        _die 1 "Unknown option: $1"
+        ;;
+      *)
+        args=("$@")
+        shift $#
+      ;;
+    esac
+    # : "parse-opt-stop"
+  done
+}
+
+cli__cache ()
+{
+  : "COMMAND,Manage cache"
+
+  # Parse args
+  clish_parse_opts cli__cache "$@"
+  set -- "${args[@]}"
+
+  # Show group help
+  [[ "${1:-}" != 'cache' ]] || {
+    clish_help cli__cache
+    _die 0
+  }
+
+  # Dispatch to sub commands
+  clish_dispatch cli__cache__ "$@" || _die $?
+}
+
+
+cli__cache__ls ()
+{
+  : ",List keyring cache entries"
+  keyring_cache_ls
+}
+
+cli__cache__clear ()
+{
+  : ",Clear keyring cache entries"
+  local count=$(keyring_cache_ls | wc -l)
+  keyring_cache_clear
+
+  _log INFO "Cleared ${count} items from keyring cache"
 }
 
 
