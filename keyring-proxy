@@ -42,7 +42,7 @@ APP_REPO="https://github.com/$APP_AUTHOR/$APP_NAME.git"
 APP_GIT="git@github.com:$APP_AUTHOR/$APP_NAME.git"
 
 APP_STATUS=stable
-APP_DATE="2024-08-17"
+APP_DATE="2024-08-20"
 APP_VERSION=0.1.1
 
 # App configuration
@@ -414,6 +414,7 @@ local_keyring_get ()
   secret-tool lookup \
     keyring-proxy-secret-name "$secret_name"
 }
+
 
 # Check if entry exists in keyring
 local_keyring_exists ()
