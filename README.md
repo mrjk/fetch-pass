@@ -25,7 +25,7 @@ It's perfect for fetching passwords in terminal or scripts and provides a simple
 
 ## 💻 Installation
 
-Current stable version is: 0.1.1
+Current stable version is: 0.2.0
 
 ### Dependencies
 
@@ -198,7 +198,7 @@ status:
 
 info:
   author:       mrjk <mrjk.78 at gmail.com>
-  version:      0.1.1-stable (2024-08-20)
+  version:      0.2.0-stable (2024-08-20)
   license:      GPLv3
   website:      https://github.com/mrjk/keyring-proxy
 ```

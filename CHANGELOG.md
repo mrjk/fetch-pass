@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 <!--- CHANGELOG_APPEND -->
 
+## Release: v0.2.0 (2024-08-21)
+
+[Compare code on Github](https://github.com/mrjk/keyring-proxy/compare/v0.1.1...v0.2.0)
+
+- [`574cee2`](https://github.com/mrjk/keyring-proxy/commit/574cee2) [mrjk](https://github.com/mrjk/) update: script date
+- [`ab01ec3`](https://github.com/mrjk/keyring-proxy/commit/ab01ec3) [mrjk](https://github.com/mrjk/) doc: Cleanup project description, add more details
+- [`723e12a`](https://github.com/mrjk/keyring-proxy/commit/723e12a) [mrjk](https://github.com/mrjk/) doc: Update lastest help message
+- [`99cb8ca`](https://github.com/mrjk/keyring-proxy/commit/99cb8ca) [mrjk](https://github.com/mrjk/) add: WArning message when remap rule is empty
+- [`a7cb92d`](https://github.com/mrjk/keyring-proxy/commit/a7cb92d) [mrjk](https://github.com/mrjk/) add: local keyring as cache layer
+- [`7f0cd41`](https://github.com/mrjk/keyring-proxy/commit/7f0cd41) [mrjk](https://github.com/mrjk/) refactor: Backend code and old branding name
+- [`3007702`](https://github.com/mrjk/keyring-proxy/commit/3007702) [mrjk](https://github.com/mrjk/) fix: Help message bad description, remove unused command flags
+- [`17ccfec`](https://github.com/mrjk/keyring-proxy/commit/17ccfec) [mrjk](https://github.com/mrjk/) fix: CHANGELOG anchor tag
+- [`032c71c`](https://github.com/mrjk/keyring-proxy/commit/032c71c) [mrjk](https://github.com/mrjk/) doc: improve documentation
+
 ## Release: v0.1.1 (2024-08-18)
 
 - `a99a2de` `2024-08-18 18:53:30 -0400` mrjk fix: bug when password had special chars
