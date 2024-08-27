@@ -2,12 +2,12 @@
 
 A simple tool to access secrets from various sources, quickly. Like its name says, it's a proxy that can cache answers in local keyring for faster/offline access.
 
-It's perfect for fetching passwords in terminal or scripts and provides a simple command to display the password of a given secret name. It also integrates with any password managers that support CLI or API.
+It's perfect for fetching passwords in terminal or scripts and provides a simple command to display the password of a given secret name. It also integrates with any password managers that support CLI or API. Keyring-proxy does not replace your password manager, it proxy it and allow to merge various passwords stores.
 
 
 ### Highlights
 
-- **Backends agnostic**: Easily manage any secret backends with a simple ini configuration.
+- **Multi-source**: Easily manage any secret backends with a simple ini configuration. As long your favorite password manager(s) provide a decent CLI tool, you're good to go.
 - **Dispatch rules**: You can rewrite secret name globally (like aliases) or per backend (linke rewrite).
 - **Local keyring proxy**: Optionnaly uses the local system keyring as a cache layer to retrieve slow-to-fecth secrets. It's also easy to flush the local cache or to resync it with backends.
 - **Query history**: Quickly find previously queried passwords. Never try to remember anymore your previous queries. It can be disabled for more privacy.
@@ -208,6 +208,14 @@ info:
 - Only tested on linux
 - Git ini file support and bash choice of script language make sometime difficult or impossible to correctly handle arguments with spaces for backends
 
+## Alternatives
+
+See also different alternative and approaches:
+
+- https://codeberg.org/caveman/nsapass
+- https://github.com/sschmid/pw-terminal-password-manager
+
+
 ## 💬 Support
 Feedback is appreciated! Please submit a PR or open an issue on the GitHub repository.
 
@@ -215,3 +223,4 @@ Feedback is appreciated! Please submit a PR or open an issue on the GitHub repos
 - **Author**: Your Name
 - **License**: GPLv3
 - **Repository**: [GitHub](https://github.com/mrjk/keyring-proxy)
+
