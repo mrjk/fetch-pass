@@ -578,14 +578,12 @@ backend_remap_name ()
   local backend_name=$1
   local secret=$2
 
-
-  local _result=
-
   # Regex remaps
+  local _result=
   remaps=$(_db get "backend.$backend_name.remap-regex" 2>/dev/null )
   while IFS='|' read old new _; do
     [[ -n "$old" ]] || continue
-    >&2 echo "REmap Regex: $old $new"
+    _log DEBUG "Remap Regex: $old $new"
 
     _result=$(sed -E "s|$old|$new|g" <<<"$secret" )
     if [[ "$_result" == "$secret" ]]; then
@@ -596,9 +594,8 @@ backend_remap_name ()
       secret=$_result
     fi
   done <<<"$remaps"
-  set +x
 
-  # String remaps
+  # Aliases remaps
   remaps=$(_db get "backend.$backend_name.remap-alias" 2>/dev/null )
   while IFS='|' read old new _; do
     [[ -n "$old" ]] || continue
@@ -731,8 +728,9 @@ backend_fetch ()
   hist_save "$secret_name" "$FOUND_BACKEND"
 }
 
+# CLI Commands
+# =================
 
-###############
 cli__usage ()
 {
   : ",Show usage"
@@ -802,7 +800,7 @@ cli__get ()
 
 cli__ls ()
 {
-  : ",List secret names"
+  : ",List secret aliases and history"
   list_known_secrets
 }
 
@@ -924,28 +922,45 @@ cli__keyring__rm ()
 #   _die 1 "Not implemented yet"
 # }
 
+
 cli__config ()
 {
-  : "OPTS,Query config"
-
-  _db "$@"
+  : ",Show current configuration"
+    cat <<EOF
+KEYRING_PROXY__CONFIG_DIR           ${APP_CONFIG_DIR}
+KEYRING_PROXY__CACHE_DIR            ${APP_CACHE_DIR}
+KEYRING_PROXY__CONFIG_FILE          ${APP_CONFIG_FILE}
+KEYRING_PROXY__HIST_FILE            ${APP_HIST_FILE}
+KEYRING_PROXY__DISABLE_HIST         ${APP_DISABLE_HIST}
+KEYRING_PROXY__DISABLE_CACHE        ${APP_DISABLE_CACHE}
+EOF
 }
-cli__db ()
-{
-  : "OPTS,Query config"
-  # set -x
-  _db db "$@"
-}
 
 
-# # CLI Sub Commands
-# # =================
+# Debug options
+
+# cli___config ()
+# {
+#   : "OPTS,Query config"
+
+#   _db "$@"
+# }
+# cli__db ()
+# {
+#   : "OPTS,Query db"
+#   # set -x
+#   _db db "$@"
+# }
+
+
+# CLI Sub Commands
+# =================
 
 # Display help message
 cli__keyring_usage ()
 {
   cat <<EOF
-${APP_NAME}: Manage keyring
+${APP_NAME}: Manage keyring-proxy
 
 usage: ${APP_NAME} keyring add NAME
        ${APP_NAME} keyring rm NAME
@@ -1127,22 +1142,28 @@ cli_options ()
         args=( "help" "$@" )
         shift
         ;;
-      -n|--dry)
-        : ",Enable dry mode"
-        _log INFO "Dry mode enabled"
-        APP_DRY=true
-        shift
-        ;;
-      -f|--force)
-        : ",Enable force mode"
-        _log INFO "Force mode enabled"
-        APP_FORCE=true
-        shift
-        ;;
+      # -n|--dry)
+      #   : ",Enable dry mode"
+      #   _log INFO "Dry mode enabled"
+      #   APP_DRY=true
+      #   shift
+      #   ;;
+      # -f|--force)
+      #   : ",Enable force mode"
+      #   _log INFO "Force mode enabled"
+      #   APP_FORCE=true
+      #   shift
+      #   ;;
       -C|--no-cache)
         : ",Disable local keyring cache"
         _log INFO "Keyring cache is disabled"
         APP_DISABLE_CACHE=true
+        shift
+        ;;
+      -H|--no-hist)
+        : ",Disable history"
+        _log INFO "Keyring cache is disabled"
+        APP_DISABLE_HIST=true
         shift
         ;;
 
