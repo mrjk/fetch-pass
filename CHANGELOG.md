@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 <!--- CHANGELOG_APPEND -->
 
+## Release: v0.3.0 (2024-08-27)
+
+[Compare code on Github](https://github.com/mrjk/keyring-proxy/compare/v0.2.0...v0.3.0)
+
+- [`0ed0c48`](https://github.com/mrjk/keyring-proxy/commit/0ed0c48) [mrjk](https://github.com/mrjk/) doc: rework typos and texts
+- [`6dd18d4`](https://github.com/mrjk/keyring-proxy/commit/6dd18d4) [mrjk](https://github.com/mrjk/) doc: Guide and coumentation
+- [`c9cd218`](https://github.com/mrjk/keyring-proxy/commit/c9cd218) [mrjk](https://github.com/mrjk/) remove: unused cli options, add --no-hist option and config
+- [`510801c`](https://github.com/mrjk/keyring-proxy/commit/510801c) [mrjk](https://github.com/mrjk/) change: remap to remap-alias, add support for remap-regex
+- [`d40154c`](https://github.com/mrjk/keyring-proxy/commit/d40154c) [mrjk](https://github.com/mrjk/) remove: KEYRING_PROXY__DISABLE_KEYRING in favor of KEYRING_PROXY__DISABLE_CACHE
+- [`61c8e19`](https://github.com/mrjk/keyring-proxy/commit/61c8e19) [mrjk](https://github.com/mrjk/) docs: update description and alternatives
+
 ## Release: v0.2.0 (2024-08-21)
 
 [Compare code on Github](https://github.com/mrjk/keyring-proxy/compare/v0.1.1...v0.2.0)
