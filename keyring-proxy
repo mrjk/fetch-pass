@@ -480,11 +480,11 @@ list_known_secrets ()
       _db ls 'secret\.' || true
     } | sed 's/secret\.//'
 
-    # Check all remaps
+    # Check all remap keys
     all_backends=$(backends_names)
     for backend_name in ${all_backends//,/ }; do
       {
-        _db get "backend.$backend_name.remap" || true
+        _db get "backend.$backend_name.remap-alias" || true
       } | sed 's/|.*//'
     done
 
@@ -578,11 +578,32 @@ backend_remap_name ()
   local backend_name=$1
   local secret=$2
 
-  remaps=$(_db get "backend.$backend_name.remap" 2>/dev/null )
+
+  local _result=
+
+  # Regex remaps
+  remaps=$(_db get "backend.$backend_name.remap-regex" 2>/dev/null )
+  while IFS='|' read old new _; do
+    [[ -n "$old" ]] || continue
+    >&2 echo "REmap Regex: $old $new"
+
+    _result=$(sed -E "s|$old|$new|g" <<<"$secret" )
+    if [[ "$_result" == "$secret" ]]; then
+      _log DEBUG "Regex rule did not match"
+    else
+      _log DEBUG "Regex rule rewrite: $secret -> $_result"
+      _log INFO "Regex rule rewrite: $_result"
+      secret=$_result
+    fi
+  done <<<"$remaps"
+  set +x
+
+  # String remaps
+  remaps=$(_db get "backend.$backend_name.remap-alias" 2>/dev/null )
   while IFS='|' read old new _; do
     [[ -n "$old" ]] || continue
     if [[ -z "$new" ]]; then
-      _log WARN "Empty remap rule in '$backend_name' for: $secret"
+      _log WARN "Empty remap key rule in '$backend_name' for: $secret"
       continue
     elif [[ "$old" == "$secret" ]]; then
       _log DEBUG "Backend '$backend_name' remapped secret '$secret' to '$new'"
@@ -756,14 +777,14 @@ cli__usage ()
 # Backends config
 [backend "keepass_personal"]
   cmd-fetch = keepass-cli get personal %s
-  remap = corp_user|Pro/Job/my_user@corp.io
-  remap = corp_keepass_devops|Pro/Job/Keepass-Devops
-  remap = corp_vault_user|Pro/Job/Ansible Activia User Vault
+  remap-alias = corp_user|Pro/Job/my_user@corp.io
+  remap-alias = corp_keepass_devops|Pro/Job/Keepass-Devops
+  remap-alias = corp_vault_user|Pro/Job/Ansible Activia User Vault
 
 [backend "bitwarden_corp"]
   cmd-fetch = bw get password %s
-  remap = corp_vault_devops|Ansible / Vaults / corp_devops
-  remap = corp_account__ansible-build-svc|Ansible / Ansible - GIT
+  remap-alias = corp_vault_devops|Ansible / Vaults / corp_devops
+  remap-alias = corp_account__ansible-build-svc|Ansible / Ansible - GIT
 
 # Secrets config
 [secret "activia_user"]
