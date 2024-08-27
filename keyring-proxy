@@ -60,16 +60,6 @@ SCRIPT_REAL_PATH=$(realpath "$0")
 SCRIPT_REAL_DIR=$( cd -- "$( dirname -- "$SCRIPT_REAL_PATH" )" &> /dev/null && pwd )
 APP_REAL_NAME=$(basename "$SCRIPT_REAL_PATH")
 
-APP_CONFIG_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/$APP_REAL_NAME
-APP_CONFIG_FILE=$APP_CONFIG_DIR/config.ini
-
-APP_CACHE_DIR=${XDG_CACHE_HOME:-$HOME/.cache}/$APP_REAL_NAME
-APP_HIST_FILE="${APP_CACHE_DIR}/hist.log"
-
-# App config
-APP_DISABLE_KEYRING=false
-APP_DISABLE_HIST=false
-
 
 # CLI libraries
 # =================
@@ -335,7 +325,7 @@ $options
 }"
 
   hist_status='enabled'
-  [[ "${APP_DISABLE_KEYRING}" == 'false' ]] || hist_status='disabled'
+  [[ "${APP_DISABLE_CACHE}" == 'false' ]] || hist_status='disabled'
   # Append extra infos
   if ! [[ "$func" == *"_"* ]]; then
     cat <<EOF
@@ -431,7 +421,8 @@ local_keyring_exists ()
 # Add into cache
 keyring_cache_set ()
 {
-  [[ "$APP_DISABLE_KEYRING" == false ]] || return 0
+  [[ "$APP_DISABLE_CACHE" == false ]] || return 0
+
 
   local secret_name="$1"
   local pass=$2
@@ -675,7 +666,7 @@ backend_fetch ()
   local secret_name=${2}
 
   # Look into keyring cache
-  if [[ "$APP_DISABLE_KEYRING" == false ]]; then
+  if [[ "$APP_DISABLE_CACHE" == false ]]; then
     local cached_result=$(keyring_cache_get "$secret_name")
     if [[ -n "$cached_result" ]]; then
       _log INFO "Return '$secret_name' key in keyring cache"
@@ -1067,9 +1058,17 @@ cli_init ()
   export WORK_DIR=${VCS_DIR:-${SCRIPT_DIR:-$PWD}}
   export PWD_DIR=${PWD}
 
-  export APP_CONFIG_FILE=${KEYRING_PROXY__CONF:-$APP_CONFIG_FILE}
-  export APP_DISABLE_KEYRING=${KEYRING_PROXY__DISABLE_KEYRING:-$APP_DISABLE_KEYRING}
-  export APP_DISABLE_HIST=${KEYRING_PROXY__DISABLE_HIST:-$APP_DISABLE_HIST}
+  # Main paths
+  export APP_CONFIG_DIR=${KEYRING_PROXY__CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/$APP_REAL_NAME}
+  export APP_CACHE_DIR=${KEYRING_PROXY__CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/$APP_REAL_NAME}
+
+  # Main files
+  export APP_CONFIG_FILE=${KEYRING_PROXY__CONFIG_FILE:-$APP_CONFIG_DIR/config.ini}
+  export APP_HIST_FILE=${KEYRING_PROXY__HIST_FILE:-${APP_CACHE_DIR}/hist.log}
+
+  export APP_DISABLE_HIST=${KEYRING_PROXY__DISABLE_HIST:-false}
+  export APP_DISABLE_CACHE=${KEYRING_PROXY__DISABLE_CACHE:-false}
+
 }
 
 # Check if all required bin are available in PATH
@@ -1119,12 +1118,13 @@ cli_options ()
         APP_FORCE=true
         shift
         ;;
-      -K|--no-keyring)
-        : ",Disable local keyring"
-        _log INFO "Keyring is disabled"
-        APP_DISABLE_KEYRING=true
+      -C|--no-cache)
+        : ",Disable local keyring cache"
+        _log INFO "Keyring cache is disabled"
+        APP_DISABLE_CACHE=true
         shift
         ;;
+
       -v|-vv|-vvv|--verbose)
         : "[LEVEL],Set verbosity level"
         if [[ "$1" == "-vv" ]]; then
