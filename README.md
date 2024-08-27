@@ -29,7 +29,7 @@ It's perfect for fetching passwords in terminal or scripts and provides a simple
   - [💡 Guide](#-guide)
     - [Create a configuration](#create-a-configuration)
     - [Work with backends](#work-with-backends)
-    - [Route passwords](#route-passwords)
+    - [Route secret](#route-secret)
     - [Remaps: Alias and Regex](#remaps-alias-and-regex)
     - [Work with cache](#work-with-cache)
     - [Work directly with keyring](#work-directly-with-keyring)
@@ -108,7 +108,7 @@ keyring-proxy get my_secret
 Call it directly in your shell or from any script, you will get your password to stdout.
 
 
-Eventually you can list known secreat names, as cheatsheet:
+You can list "known secret names" (alias keys in config), as cheatsheet:
 ```bash
 keyring-proxy ls
 ```
@@ -119,7 +119,7 @@ keyring-proxy hist
 ```
 
 Keyring-proxy works with a config file usually located in `$XDG_CONFIG_HOME/keyring-proxy/config.ini`. This configuration is required and it belongs to the user to build its own.
-Below an example of config. See next chapter to create your config.
+Below a partial example of config. See next chapter to create your config.
 
 ```ini
 [config]
@@ -150,7 +150,7 @@ keyring-proxy config
 
 ### Work with backends
 
-A backend a password source of truth, and it can be any password store, if it provides a CLI access. It's one of the most important concepts in keyring-proxy. Backends are defined in the `config.ini` file, here is an example with keepass and bitwarden:
+A backend a password source of truth, and it can be any password store, if it provides a CLI access. It's one of the most important concepts in keyring-proxy. Backends are defined in the `config.ini` file, here is an example with keepass, bitwarden and a custom made script:
 
 ```ini file=config.ini
 [config]
@@ -167,25 +167,25 @@ A backend a password source of truth, and it can be any password store, if it pr
 
 # A custom backend
 [backend "dump_script"]
-  cmd-fetch = dumb-script.sh --get-pass %s
+  cmd-fetch = dumb-script.sh --get-pass-stdout %s
 ```
 
-This configuration defines that for a given secret query, it must first ask the first backend `bitwarden_job`, if it does not find anything, it will ask `keepass_perso` and so on. The `fetch-cmd` command must return a non empty clear password on stdout.
+This configuration defines that for a given secret query, it must first ask the first backend `bitwarden_job`, if it does not find anything, it will ask `keepass_perso` and so on. The `fetch-cmd` command must return a non empty password on stdout in clear text.
 
 
   > Note: See configuration file section for exact syntax
 
 
-Backend order may have it's importance, depending how you would like your secrets to be queried. Some backends are also longuer to query than others, you may want to put the longest at the last. Even when the keyring-proxy cache is enabled, this first queries can sometimes be long to be resolved. If no backends answer, then keyring-proxy exits with non 0 exit code.
+Backend order may have it's importance, depending how you want your secrets to be queried. Some backends are also longuer to query than others, you may want to put the longest at last. Even if the keyring-proxy cache is enabled, first queries can sometimes take time to answer. Finally, if no backend answer, then keyring-proxy exits with non 0 exit code.
 
 
-### Route passwords
+### Route secret
 
 TODO
 
 ### Remaps: Alias and Regex
 
-For a given secret name, this can happen that this key exists in different backends, having a different name or path. As this can depends on your backend, you may want to use `remap-alias` or `remap-regex`. For example:
+For a given secret name, you may need to rewrite its name to before querying the backend. Indeed, usually, each password backends have it own structure and secret names. Keyring-proxy allow you to define `remap-alias` and `remap-regex`. For example:
 
 ```ini file=config.ini
 # Job secrets with bitwarden-cli
@@ -210,6 +210,8 @@ For a given secret name, this can happen that this key exists in different backe
   remap-alias = home_lab|Home/lab_password
 
 ```
+
+The pipe `|` char act as delimiter.
 
   > Note: See configuration file section for exact syntax
 
@@ -366,6 +368,8 @@ info:
 ```
 
 ### Internal algorithm
+
+No secrets are ever stored in clear text at any moment.
 
 The lookup algorihtm is like:
 
